@@ -18,7 +18,7 @@ const fetchMovie = async (title: string) => {
 
 // Add Movie to List
 //@ts-ignore
-router.post("/add", authenticate, async (req: any, res) => {
+router.post("/:username/add", authenticate, async (req: any, res) => {
   try {
     const { title, status } = req.body;
     const userId = req.user.userId;
@@ -38,26 +38,7 @@ router.post("/add", authenticate, async (req: any, res) => {
 
 // Get Movies by Status
 //@ts-ignore
-router.get("/:status", authenticate, async (req: any, res) => {
-    try {
-      const { status } = req.params;
-      const userId = req.user.userId;
-  
-      // Validate status
-      if (!Object.values(MovieStatus).includes(status as MovieStatus)) {
-        return res.status(400).json({ message: `Invalid status: ${status}` });
-      }
-  
-      const movies = await prisma.movieLog.findMany({
-        where: { userId, status: status as MovieStatus },
-      });
-  
-      res.json(movies);
-    } catch (error: any) {
-      res.status(500).json({ message: "Failed to fetch movies", error: error.message });
-    }
-  });
-  
+
 
 router.get("/:username/films", authenticate, async (req: any, res) => {
     try {
