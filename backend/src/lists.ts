@@ -7,7 +7,7 @@ import { authenticate } from "./auth";
 dotenv.config();
 const prisma = new PrismaClient();
 const router = express.Router();
-const OMDB_API_KEY = process.env.OMDB_API_KEY || "your_omdb_api_key";
+
 
 router.get("/:username/WATCHED", authenticate, async (req: any, res) => {
     try {

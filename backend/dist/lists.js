@@ -19,7 +19,6 @@ const auth_1 = require("./auth");
 dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
 const router = express_1.default.Router();
-const OMDB_API_KEY = process.env.OMDB_API_KEY || "your_omdb_api_key";
 router.get("/:username/WATCHED", auth_1.authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user.userId;

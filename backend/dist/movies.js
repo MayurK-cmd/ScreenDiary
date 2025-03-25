@@ -30,15 +30,27 @@ const fetchMovie = (title) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // Add Movie to List
 //@ts-ignore
-router.post("/:username/add", auth_1.authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/add", auth_1.authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { title, status } = req.body;
-        const userId = req.user.userId;
-        if (!title || !status)
-            return res.status(400).json({ message: "title and status required" });
+        const userId = req.user.userId; // Ensure authenticate middleware attaches user data
+        if (!title || !status) {
+            return res.status(400).json({ message: "Title and status are required" });
+        }
+        const validStatuses = Object.values(client_1.MovieStatus);
+        const upperStatus = status.toUpperCase();
+        if (!validStatuses.includes(upperStatus)) {
+            return res.status(400).json({ message: "Invalid status" });
+        }
         const movie = yield fetchMovie(title);
         const movieLog = yield prisma.movieLog.create({
-            data: { userId, imdbId: movie.imdbID, title: movie.Title, poster: movie.Poster, status: status.toUpperCase() },
+            data: {
+                userId,
+                imdbId: movie.imdbID,
+                title: movie.Title,
+                poster: movie.Poster,
+                status: upperStatus
+            },
         });
         res.status(201).json({ message: "Movie added", movieLog });
     }
@@ -47,24 +59,18 @@ router.post("/:username/add", auth_1.authenticate, (req, res) => __awaiter(void 
     }
 }));
 // Get Movies by Status
-//@ts-ignore
-router.get("/:username/films", auth_1.authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/films", auth_1.authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user.userId;
-        const watched = yield prisma.movieLog.findMany({
-            where: { userId, status: "WATCHED" },
+        const moviesByStatus = yield prisma.movieLog.findMany({
+            where: { userId },
         });
-        const watching = yield prisma.movieLog.findMany({
-            where: { userId, status: "WATCHING" },
-        });
-        const watchlist = yield prisma.movieLog.findMany({
-            where: { userId, status: "WATCHLIST" },
-        });
-        res.json({
-            watched,
-            watching,
-            watchlist,
-        });
+        const categorizedMovies = {
+            WATCHED: moviesByStatus.filter(movie => movie.status === "WATCHED"),
+            WATCHING: moviesByStatus.filter(movie => movie.status === "WATCHING"),
+            WATCHLIST: moviesByStatus.filter(movie => movie.status === "WATCHLIST"),
+        };
+        res.json(categorizedMovies);
     }
     catch (error) {
         res.status(500).json({ message: "Failed to fetch movies", error: error.message });
