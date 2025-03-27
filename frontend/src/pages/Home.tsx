@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Play, PlusCircle } from "lucide-react";
+import { Play, PlusCircle, LogIn } from "lucide-react";
 
 const Home = () => {
   return (
@@ -25,6 +25,16 @@ const Home = () => {
             className="flex items-center justify-center px-6 py-3 text-lg font-semibold bg-gray-800 hover:bg-gray-700 rounded-lg transition-all duration-300 shadow-lg"
           >
             <PlusCircle className="mr-2" size={20} /> Add Movie
+          </Link>
+        </div>
+
+        {/* Sign Up / Sign In Button */}
+        <div className="mt-6">
+          <Link
+            to="/signup"
+            className="flex items-center justify-center px-6 py-3 text-lg font-semibold bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-300 shadow-lg"
+          >
+            <LogIn className="mr-2" size={20} /> Sign Up / Sign In
           </Link>
         </div>
       </div>
