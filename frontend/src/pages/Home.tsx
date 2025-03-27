@@ -17,7 +17,7 @@ const Home = () => {
             to="/dashboard"
             className="flex items-center justify-center px-6 py-3 text-lg font-semibold bg-blue-600 hover:bg-blue-700 rounded-lg transition-all duration-300 shadow-lg"
           >
-            <Play className="mr-2" size={20} /> View Movies
+            <Play className="mr-2" size={20} /> View My Movies
           </Link>
 
           <Link
