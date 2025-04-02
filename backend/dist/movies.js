@@ -31,6 +31,7 @@ const fetchMovie = (title) => __awaiter(void 0, void 0, void 0, function* () {
 // Add Movie to List
 //@ts-ignore
 router.post("/add", auth_1.authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         const { title, status } = req.body;
         const userId = req.user.userId; // Ensure authenticate middleware attaches user data
@@ -49,7 +50,18 @@ router.post("/add", auth_1.authenticate, (req, res) => __awaiter(void 0, void 0,
                 imdbId: movie.imdbID,
                 title: movie.Title,
                 poster: movie.Poster,
-                status: upperStatus
+                status: upperStatus,
+                //@ts-ignore
+                rated: movie.Rated,
+                year: movie.Year,
+                genre: movie.Genre,
+                actors: movie.Actors,
+                plot: movie.Plot,
+                country: movie.Country,
+                imdbRating: movie.imdbRating,
+                rottenTomatoesRating: movie.Ratings && Array.isArray(movie.Ratings)
+                    ? ((_a = movie.Ratings.find((r) => r.Source === "Rotten Tomatoes")) === null || _a === void 0 ? void 0 : _a.Value) || null
+                    : null
             },
         });
         res.status(201).json({ message: "Movie added", movieLog });

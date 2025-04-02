@@ -41,9 +41,23 @@ router.post("/add", authenticate, async (req, res) => {
         imdbId: movie.imdbID, 
         title: movie.Title, 
         poster: movie.Poster, 
-        status: upperStatus 
+        status: upperStatus,
+        //@ts-ignore
+        rated: movie.Rated,
+        year: movie.Year,
+        genre: movie.Genre,
+        actors: movie.Actors,
+        plot: movie.Plot,
+        country: movie.Country,
+        imdbRating: movie.imdbRating,
+        rottenTomatoesRating: movie.Ratings && Array.isArray(movie.Ratings) 
+          ? movie.Ratings.find((r: { Source: string, Value: string }) => r.Source === "Rotten Tomatoes")?.Value || null
+          : null
       },
+    
     });
+    
+    
 
     res.status(201).json({ message: "Movie added", movieLog });
   } catch (error: any) {

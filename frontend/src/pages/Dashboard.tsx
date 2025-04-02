@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/Authcontext";
-import { Eye, Check, ListPlus } from "lucide-react";
+import { Eye, Check, ListPlus} from "lucide-react";
+import { Link } from "react-router-dom";
+import AddMovieModal from "../components/Modals/AddMovieModal"; 
 
 interface MovieType {
   id: number;
@@ -9,12 +11,24 @@ interface MovieType {
   director: string;
   status: string;
   releaseYear: number;
+  poster: string;
+  rating: number;
+  description: string;
+  plot: string;
+  year: string;
+  genre: string;
+  actors: string;
+  rated: string;
+  country: string;
+  imdbRating: string;
+  rottenTomatoesRating: string;
 }
 
 const Dashboard = () => {
   const [movies, setMovies] = useState<MovieType[]>([]);
   const [filter, setFilter] = useState<string>("ALL");
   const { token } = useAuth();
+  const [selectedMovie, setSelectedMovie] = useState<MovieType | null>(null); // ✅ Manage modal state
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -22,117 +36,134 @@ const Dashboard = () => {
         const res = await axios.get(`http://localhost:3000/screendiary/films`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-  
-        console.log("API Response:", res.data);
-  
-        // Combine all movies into a single array
+
         const allMovies = [
           ...(res.data.WATCHED || []),
           ...(res.data.WATCHING || []),
           ...(res.data.WATCHLIST || []),
         ];
-  
+
         setMovies(allMovies);
       } catch (error) {
         console.error("Error fetching movies:", error);
         alert("Error fetching movies");
       }
     };
-  
+
     if (token) {
       fetchMovies();
     }
   }, [token]);
 
-  // Status color and icon mapping
-  const statusConfig = {
-    WATCHLIST: { 
-      color: "bg-yellow-500", 
-      icon: <ListPlus className="text-yellow-500" size={20} /> 
-    },
-    WATCHING: { 
-      color: "bg-blue-500", 
-      icon: <Eye className="text-blue-500" size={20} /> 
-    },
-    WATCHED: { 
-      color: "bg-green-500", 
-      icon: <Check className="text-green-500" size={20} /> 
-    }
+  type StatusConfigType = {
+    [key: string]: {
+      color: string;
+      icon: React.ReactNode;
+    };
   };
 
-  // Filter movies based on selected status
-  const filteredMovies = filter === "ALL" 
-    ? movies 
-    : movies.filter(movie => movie.status === filter);
-  
+  const statusConfig: StatusConfigType = {
+    WATCHED: {
+      color: "bg-green-500",
+      icon: <Eye className="w-5 h-5 text-green-500" />,
+    },
+    WATCHING: {
+      color: "bg-blue-500",
+      icon: <Check className="w-5 h-5 text-blue-500" />,
+    },
+    WATCHLIST: {
+      color: "bg-yellow-500",
+      icon: <ListPlus className="w-5 h-5 text-yellow-500" />,
+    },
+  };
+
+  const filteredMovies =
+    filter === "ALL" ? movies : movies.filter((movie) => movie.status === filter);
+
   return (
-    <div className="min-h-screen bg-black p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Filter Buttons */}
-        <div className="flex justify-center mb-8 space-x-4">
-          {["ALL", "WATCHLIST", "WATCHING", "WATCHED"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg text-white font-semibold transition duration-300 
-                ${filter === status 
-                  ? 'bg-blue-700' 
-                  : 'bg-gray-800 hover:bg-gray-700'}`}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
+    <div className="min-h-screen bg-white flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-gray-200 p-6 hidden md:block h-screen fixed">
+        <nav className="space-y-4">
+          <Link to="/profile" className="block font-semibold text-gray-800 hover:text-gray-600">
+            My Profile
+          </Link>
+          <Link to="/lists" className="block font-semibold text-gray-800 hover:text-gray-600">
+            My Lists
+          </Link>
+          <Link to="/add-movie" className="block font-semibold text-gray-800 hover:text-gray-600">
+            Add Movie
+          </Link>
+        </nav>
+      </aside>
 
-        {/* Movies Grid */}
-        {filteredMovies.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMovies.map((movie) => (
-              <div 
-                key={movie.id} 
-                className="bg-gray-900 rounded-xl p-6 border border-gray-800 
-                           transform transition duration-300 hover:scale-105 
-                           hover:shadow-2xl relative"
+      <div className="flex-1 p-6 ml-64">
+        {/* Full-width Navbar */}
+        <nav className="bg-gray-100 text-gray-800 p-4 flex justify-between items-center fixed top-0 left-0 right-0 shadow-md">
+          <h1 className="text-xl font-bold">Dashboard</h1>
+          <div className="space-x-4">
+            <Link to="/profile" className="hover:underline">
+              My Profile
+            </Link>
+            <Link to="/lists" className="hover:underline">
+              My Lists
+            </Link>
+          </div>
+        </nav>
+
+        <div className="max-w-6xl mx-auto mt-16">
+          <div className="flex justify-center mb-8 space-x-4">
+            {["ALL", "WATCHLIST", "WATCHING", "WATCHED"].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-4 py-2 rounded-lg font-semibold transition duration-300 
+                  ${filter === status ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800 hover:bg-gray-400"}`}
               >
-                {/* Status Indicator */}
-                <div className="absolute top-4 right-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${statusConfig[movie.status].color} bg-opacity-20`}>
-                    {statusConfig[movie.status].icon}
-                  </div>
-                </div>
-
-                <h2 className="text-xl font-bold text-white mb-2 truncate">
-                  {movie.title}
-                </h2>
-                
-                <div className="text-gray-400 space-y-1">
-                  {movie.director && (
-                    <p className="text-sm">
-                      <span className="font-semibold text-gray-300">Director:</span> {movie.director}
-                    </p>
-                  )}
-                  <p className="text-sm">
-                    <span className="font-semibold text-gray-300">Release Year:</span> {movie.releaseYear}
-                  </p>
-                  <div className="flex items-center space-x-2 mt-2">
-                    <span 
-                      className={`px-3 py-1 rounded-full text-xs font-medium 
-                        ${statusConfig[movie.status].color} 
-                        text-white bg-opacity-20`}
-                    >
-                      {movie.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                {status}
+              </button>
             ))}
           </div>
-        ) : (
-          <div className="text-center text-gray-500 py-12">
-            <p className="text-xl">No movies in this category.</p>
-          </div>
-        )}
+
+          {filteredMovies.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredMovies.map((movie) => (
+                <div
+                  key={movie.id}
+                  className="bg-gray-100 rounded-xl p-4 border border-gray-300 
+                             transform transition duration-300 hover:scale-105 hover:shadow-lg relative"
+                >
+                  <div className="absolute top-4 right-4">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center ${statusConfig[movie.status].color} bg-opacity-20`}
+                    >
+                      {statusConfig[movie.status].icon}
+                    </div>
+                  </div>
+                  <img
+                    src={movie.poster}
+                    alt={movie.title}
+                    className="w-full h-64 object-cover rounded-md mb-4 cursor-pointer"
+                    onClick={() => setSelectedMovie(movie)} // ✅ Opens modal
+                  />
+                  <h2 className="text-lg font-bold text-gray-800 mb-2 truncate">{movie.title}</h2>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-12">
+              <p className="text-xl">No movies in this category.</p>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* ✅ Add Movie Modal */}
+      <AddMovieModal
+        isOpen={!!selectedMovie} // Show modal only if a movie is selected
+        onClose={() => setSelectedMovie(null)} // Close modal when needed
+        selectedMovie={selectedMovie} // Pass movie data to modal
+      />
     </div>
   );
 };
