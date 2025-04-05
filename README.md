@@ -1,1 +1,1 @@
-A simple backend where users can log their movies or series as watched, watching or watchlist after successfull auth
+
