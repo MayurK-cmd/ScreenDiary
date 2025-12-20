@@ -13,5 +13,8 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/movies', movieRoutes);
 app.use('/ai-rec', aiRoutes);
+app.get('/', (req, res) => {
+  res.send('Welcome to the Movie Recommendation API');
+});
 
 export default app;
