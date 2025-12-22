@@ -4,6 +4,6 @@ import {addToWatchlist,addToWatched,getWatched} from '../controllers/movie.contr
 const router = Router();
 router.post('/watchlist', addToWatchlist);
 router.post('/watched', addToWatched);
-router.get('/watched/:userId', getWatched);
+router.get('/watched-by-me', getWatched);
 
 export default router;
