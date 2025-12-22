@@ -26,31 +26,32 @@ export async function addToWatchlist(req, res) {
 export async function addToWatched(req, res) {
   try {
     const { title, rating } = req.body;
-    const userId = req.user.userId; // 🔐 trusted
+    const userId = req.user.userId;
 
     const movie = await fetchAndStoreMovieByTitle(title);
 
-    const { error } = await supabase.from("user_movies").upsert(
-      {
-        user_id: userId,
-        movie_id: movie.id,
-        status: "watched",
-        rating,
-      },
-      {
-        onConflict: "user_id,movie_id",
-      }
-    );
+    const { error } = await supabase
+      .from("user_movies")
+      .upsert(
+        {
+          user_id: userId,
+          movie_id: movie.id,
+          status: "watched",
+          rating,
+        },
+        { onConflict: "user_id,movie_id" }
+      );
 
     if (error) {
       return res.status(400).json({ error: error.message });
     }
 
-    res.json({ success: true, movie });
+    res.json({ movie });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
+
 
 
 

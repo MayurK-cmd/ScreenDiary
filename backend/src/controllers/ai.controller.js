@@ -4,7 +4,7 @@ import { getGeminiResponse } from "../services/gemini.service.js";
 
 export async function getRecommendations(req, res) {
   try {
-    const { userId } = req.body;
+    const userId = req.user.userId;
 
     const { data } = await supabase
       .from("user_movies")
@@ -14,7 +14,7 @@ export async function getRecommendations(req, res) {
 
     if (!data || data.length === 0) {
       return res.status(400).json({
-        error: "No watched movies found for recommendations"
+        error: "No watched movies found for recommendations",
       });
     }
 
@@ -23,14 +23,12 @@ export async function getRecommendations(req, res) {
 
     await supabase.from("ai_recommendations").insert({
       user_id: userId,
-      recommendations
+      recommendations,
     });
 
     res.json(recommendations);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      error: err.message || "AI recommendation failed"
-    });
+    res.status(500).json({ error: err.message });
   }
 }
+
