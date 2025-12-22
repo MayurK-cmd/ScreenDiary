@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { api } from "../services/api";
 
 export default function MovieForm({ onAdd }) {
   const [title, setTitle] = useState("");
@@ -8,14 +9,14 @@ export default function MovieForm({ onAdd }) {
     const token = localStorage.getItem("token");
     if (!token) return alert("Login required");
 
-    const res = await fetch("http://localhost:3000/movies/watched", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ title, rating }),
+    const res = await api.post("/movies/watched", {
+      title,
+      rating,
+    }, {
+      headers: { Authorization: `Bearer ${token}` },
     });
+
+    
 
     const data = await res.json();
     if (!res.ok) return alert(data.error);
