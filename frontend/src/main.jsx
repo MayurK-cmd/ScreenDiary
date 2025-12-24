@@ -8,6 +8,7 @@ import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 
 import App from "./App";
 import "@solana/wallet-adapter-react-ui/styles.css";
+import "./index.css";
 
 const endpoint = "https://api.mainnet-beta.solana.com";
 const wallets = [new PhantomWalletAdapter()];
