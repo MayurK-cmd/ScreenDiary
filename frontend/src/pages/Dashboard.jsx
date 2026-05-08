@@ -4,7 +4,6 @@ import MovieList from "../components/MovieList";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import { Sparkles, LogOut } from "lucide-react";
-import { WalletDisconnectButton } from "@solana/wallet-adapter-react-ui";
 
 export default function Dashboard() {
   const [movies, setMovies] = useState([]);
@@ -50,8 +49,7 @@ export default function Dashboard() {
       <nav className="border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
           <h2 className="text-2xl font-bold font-outfit text-indigo-600">ScreenDiary</h2>
-          <WalletDisconnectButton />
-          <button onClick={() => { localStorage.removeItem("token"); navigate("/"); }} 
+          <button onClick={() => { localStorage.removeItem("token"); navigate("/"); }}
             className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 rounded-full transition-colors">
             <LogOut className="w-5 h-5" />
           </button>
