@@ -1,4 +1,5 @@
-import { useNavigate, useState } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import { Film } from "lucide-react";
 

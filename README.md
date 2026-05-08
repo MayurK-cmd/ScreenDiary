@@ -66,11 +66,22 @@ CREATE TABLE users (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Movies table
+CREATE TABLE movies (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  year INTEGER,
+  genres TEXT[],  -- Array of strings for movie genres
+  imdb_id TEXT NOT NULL UNIQUE,
+  poster TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- User movies table
 CREATE TABLE user_movies (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  movie_id INTEGER NOT NULL,
+  movie_id UUID REFERENCES movies(id) ON DELETE CASCADE,
   status TEXT CHECK (status IN ('watchlist', 'watched')) NOT NULL,
   rating INTEGER CHECK (rating >= 1 AND rating <= 10),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -81,12 +92,13 @@ CREATE TABLE user_movies (
 CREATE TABLE ai_recommendations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  recommendations TEXT NOT NULL,
+  recommendations JSONB NOT NULL,  -- Stores JSON object with movie recommendations
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Enable real-time (optional, for future features)
 alter publication supabase_realtime add table users;
+alter publication supabase_realtime add table movies;
 alter publication supabase_realtime add table user_movies;
 alter publication supabase_realtime add table ai_recommendations;
 ```
